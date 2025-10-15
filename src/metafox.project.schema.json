@@ -1,0 +1,120 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://metafox.com/schemas/project.json",
+  "title": "MetaFox Project Configuration",
+  "description": "Configuration file for MetaFox project settings, paths, aliases, and packages",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Path to the schema file",
+      "examples": ["./metafox.project.schema.json"]
+    },
+    "paths": {
+      "type": "object",
+      "description": "Project path configurations",
+      "properties": {
+        "dockerComposeHome": {
+          "type": "string",
+          "description": "Path to the Docker Compose home directory",
+          "examples": ["~/Sites/vshare", "/path/to/project"]
+        },
+        "projectConfigFile": {
+          "type": "string",
+          "description": "Path to the project configuration file",
+          "examples": ["~/Sites/vshare/metafox.project.json"]
+        },
+        "backendHome": {
+          "type": "string",
+          "description": "Path to the backend home directory",
+          "examples": ["~/Sites/vshare/backend"]
+        },
+        "frontendHome": {
+          "type": "string",
+          "description": "Path to the frontend home directory",
+          "examples": ["~/Sites/vshare/frontend"]
+        },
+        "dockerComposeFile": {
+          "type": "string",
+          "description": "Path to the docker filename",
+          "examples": ["docker-compose.yml"],
+          "default": "docker-compose.yml"
+        }
+      },
+      "required": [
+        "dockerComposeHome",
+        "projectConfigFile",
+        "backendHome",
+        "frontendHome",
+        "dockerComposeFile"
+      ],
+      "additionalProperties": false
+    },
+    "alias": {
+      "type": "object",
+      "description": "Command aliases for common operations",
+      "patternProperties": {
+        "^[a-zA-Z0-9_-]+$": {
+          "type": "string",
+          "description": "Command to execute when alias is invoked"
+        }
+      },
+      "additionalProperties": false,
+      "examples": [
+        {
+          "artisan": "docker-compose exec app php artisan",
+          "composer": "docker-compose exec app php ./composer"
+        }
+      ]
+    },
+    "packages": {
+      "type": "array",
+      "description": "List of packages in the MetaFox project",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Package name in vendor/package format",
+            "pattern": "^[a-z0-9_-]+/[a-z0-9_-]+$",
+            "examples": ["voiceshare/user", "voiceshare/campaign"]
+          },
+          "models": {
+            "type": "array",
+            "description": "List of models in the package",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Model name",
+                  "examples": ["activity", "campaign", "User"]
+                },
+                "entity": {
+                  "type": "string",
+                  "description": "Entity name for the model",
+                  "examples": ["user_entity", "campaign"]
+                },
+                "table": {
+                  "type": "string",
+                  "description": "Database table name",
+                  "examples": ["vs_user_entities", "vs_campaigns"]
+                },
+                "repository": {
+                  "type": "boolean",
+                  "description": "Whether the model has a repository",
+                  "default": false
+                }
+              },
+              "required": ["name"],
+              "additionalProperties": false
+            }
+          }
+        },
+        "required": ["name"],
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false
+}

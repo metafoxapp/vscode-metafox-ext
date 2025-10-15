@@ -1,0 +1,42 @@
+{
+  "$schema": "./metafox.project.schema.json",
+  "paths": {
+    "dockerComposeHome": "~/Sites/vshare",
+    "projectConfigFile": "~/Sites/vshare/metafox.project.json",
+    "backendHome": "~/Sites/vshare/backend",
+    "frontendHome": "~/Sites/vshare/frontend",
+    "dockerComposeFile": "docker-compose.yml"
+  },
+  "alias": {
+    "artisan": "docker-compose exec app php artisan",
+    "composer": "docker-compose exec app php ./composer"
+  },
+  "packages": [
+    {
+      "name": "voiceshare/user",
+      "models": [
+        {
+          "name": "activity",
+          "entity": "user_entity",
+          "table": "vs_user_entities",
+          "repository": true
+        }
+      ]
+    },
+    {
+      "name": "voiceshare/campaign",
+      "models": [
+        {
+          "name": "campaign",
+          "entity": "campaign",
+          "table": "vs_campaigns",
+          "repository": true
+        }
+      ]
+    },
+    {
+      "name": "voiceshare/reward",
+      "models": [{ "name": "User" }]
+    }
+  ]
+}
