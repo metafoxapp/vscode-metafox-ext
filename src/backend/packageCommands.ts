@@ -8,6 +8,9 @@ const commandList: CommandList = {
   optimize: async (config) => {
     utils.sendCommands("php artisan optimize");
   },
+  about: async () => {
+    utils.sendCommands(`php artisan about`);
+  },
   "composer:install": async (config) => {
     utils.sendCommands(`rm -f ./composer.lock`, `./composer install`);
   },
@@ -51,7 +54,7 @@ const commandList: CommandList = {
   },
   "scribe:generate": async (config) => {
     utils.sendCommands(
-      `(test -z "$(./composer show -N |grep  knuckleswtf/scribe) || ./composer require knuckleswtf/scribe")`,
+      `(test ! -z "$(./composer show -N |grep  knuckleswtf/scribe)" || ./composer require knuckleswtf/scribe)`,
       "php artisan scribe:generate"
     );
   },

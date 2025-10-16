@@ -1,5 +1,5 @@
 {
-  "$schema": "./metafox.project.schema.json",
+  "$schema": "https://raw.githubusercontent.com/metafoxapp/vscode-metafox-ext/refs/heads/main/src/metafox.project.json",
   "paths": {
     "dockerComposeHome": "~/Sites/vshare",
     "projectConfigFile": "~/Sites/vshare/metafox.project.json",

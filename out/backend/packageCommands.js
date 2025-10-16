@@ -38,6 +38,9 @@ const commandList = {
     optimize: async (config) => {
         utils.sendCommands("php artisan optimize");
     },
+    about: async () => {
+        utils.sendCommands(`php artisan about`);
+    },
     "composer:install": async (config) => {
         utils.sendCommands(`rm -f ./composer.lock`, `./composer install`);
     },
@@ -75,7 +78,7 @@ const commandList = {
         utils.sendCommands("php artisan metafox:check-compatibility");
     },
     "scribe:generate": async (config) => {
-        utils.sendCommands(`(test -z "$(./composer show -N |grep  knuckleswtf/scribe) || ./composer require knuckleswtf/scribe")`, "php artisan scribe:generate");
+        utils.sendCommands(`(test ! -z "$(./composer show -N |grep  knuckleswtf/scribe)" || ./composer require knuckleswtf/scribe)`, "php artisan scribe:generate");
     },
     "config:clear": async (config) => {
         utils.sendCommands("php artisan config:clear");

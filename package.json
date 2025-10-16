@@ -2,7 +2,7 @@
   "name": "metafox-ext",
   "displayName": "MetaFox Command Helper",
   "description": "MetaFox extension helper",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "author": {
     "name": "YouNetSocial",
     "email": "developer@phpfox.com",

@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://metafox.com/schemas/project.json",
-  "title": "MetaFox Project Configuration",
+  "title": "MetaFox VSCode Project Configuration",
   "description": "Configuration file for MetaFox project settings, paths, aliases, and packages",
   "type": "object",
   "properties": {
@@ -104,9 +104,14 @@
                   "type": "boolean",
                   "description": "Whether the model has a repository",
                   "default": false
+                },
+                "factory": {
+                  "type": "boolean",
+                  "description": "Whether the model has a factory",
+                  "default": true
                 }
               },
-              "required": ["name"],
+              "required": ["name", "factory"],
               "additionalProperties": false
             }
           }
