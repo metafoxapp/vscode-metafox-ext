@@ -1,208 +1,702 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
-import { CommandList } from "../typings";
+import { CommandList, Model, Package } from "../typings";
 import * as utils from "../utils";
 
-const commandList: CommandList = {
-  optimize: async (config) => {
-    utils.sendCommands("php artisan optimize");
+const commandList: CommandList = [
+  {
+    label: "optimize",
+    description: "Optimize the application",
+    handler: async (config) => {
+      utils.sendCommands("php artisan optimize");
+    },
   },
-  about: async () => {
-    utils.sendCommands(`php artisan about`);
+  {
+    label: "about",
+    description: "Show information about the application",
+    handler: async () => {
+      utils.sendCommands(`php artisan about`);
+    },
   },
-  "composer:install": async (config) => {
-    utils.sendCommands(`rm -f ./composer.lock`, `./composer install`);
+  {
+    label: "permission:show",
+    description: "Show the permissions",
+    handler: async () => {
+      utils.sendCommands(`php artisan permission:show`);
+    },
   },
-  "metafox:install": async (config) => {
-    utils.sendCommands(
-      `rm -f ./composer.lock && ./composer install`,
-      `(test -f .env && php artisan db:wipe --force)`,
-      `(test -f .env && sed -in '/MFOX_APP_INSTALLED=true/d' .env)`,
-      `./composer metafox:install`
-    );
+  {
+    label: "permission:list",
+    description: "List the permissions",
+    handler: async () => {
+      utils.sendCommands(`php artisan permission:list`);
+    },
   },
-  "db:wipe": async (config) => {
-    utils.sendCommands("php artisan db:wipe --force");
+  {
+    label: "queue:clear",
+    description: "Clear the queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:clear`);
+    },
   },
-  "optimize:clear": async (config) => {
-    utils.sendCommands("php artisan optimize:clear");
+  {
+    label: "queue:failed",
+    description: "Show the failed queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:failed`);
+    },
   },
-  "frontend:build": async (config) => {
-    utils.sendCommands("php artisan frontend:build");
+  {
+    label: "queue:flush",
+    description: "Flush the queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:flush`);
+    },
   },
-  "frontend:env": async (config) => {
-    utils.sendCommands("php artisan frontend:env");
+  {
+    label: "queue:forget",
+    description: "Forget the queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:forget`);
+    },
   },
-  "ide:fix": async (config) => {
-    utils.sendCommands("php artisan ide:fix");
+  {
+    label: "queue:listen",
+    description: "Listen to the queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:listen`);
+    },
   },
-  "metafox:dump": async (config) => {
-    utils.sendCommands("php artisan metafox:dump");
+  {
+    label: "queue:restart",
+    description: "Restart the queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:restart`);
+    },
   },
-  "metafox:seed": async (config) => {
-    utils.sendCommands("php artisan metafox:seed");
+  {
+    label: "queue:retry",
+    description: "Retry the queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:retry`);
+    },
   },
-  "metafox:stats": async (config) => {
-    utils.sendCommands("php artisan metafox:stats");
+  {
+    label: "queue:work",
+    description: "Work the queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:work`);
+    },
   },
-  "metafox:update-admin-search": async (config) => {
-    utils.sendCommands("php artisan metafox:update-admin-search");
+  {
+    label: "queue:monitor",
+    description: "Monitor the queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:monitor`);
+    },
   },
-  "metafox:check-compatibility": async (config) => {
-    utils.sendCommands("php artisan metafox:check-compatibility");
+  {
+    label: "queue:prune",
+    description: "Prune the queue",
+    handler: async () => {
+      utils.sendCommands(`php artisan queue:prune`);
+    },
   },
-  "scribe:generate": async (config) => {
-    utils.sendCommands(
-      `(test ! -z "$(./composer show -N |grep  knuckleswtf/scribe)" || ./composer require knuckleswtf/scribe)`,
-      "php artisan scribe:generate"
-    );
+  {
+    label: "composer:install",
+    description: "Install the composer dependencies",
+    handler: async (config) => {
+      utils.sendCommands(`rm -f ./composer.lock`, `./composer install`);
+    },
   },
-  "config:clear": async (config) => {
-    utils.sendCommands("php artisan config:clear");
+  {
+    label: "metafox:upgrade",
+    description: "Upgrade the Metafox application",
+    handler: async (config) => {
+      utils.sendCommands(`php artisan metafox:upgrade`);
+    },
   },
-  "package:activate": async (config) => {
-    const pkg = await utils.pickPackage(config);
-    utils.sendCommands(`php artisan package:activate ${pkg.name}`);
+  {
+    label: "metafox:install --force",
+    description: "Install the Metafox application",
+    handler: async (config) => {
+      utils.sendCommands(
+        `rm -f ./composer.lock && ./composer install`,
+        `(test -f .env && php artisan db:wipe --force)`,
+        `(test -f .env && sed -in '/MFOX_APP_INSTALLED=true/d' .env)`,
+        `php artisan optimize:clear`,
+        `./composer metafox:install`
+      );
+    },
   },
-  "package:discover": async (config) => {
-    utils.sendCommands(`php artisan package:discover`);
+  {
+    label: "schedule:clear-cache",
+    description: "Clear the schedule cache",
+    handler: async () => {
+      utils.sendCommands(`php artisan schedule:clear-cache`);
+    },
   },
-  "package:fix": async (config) => {
-    const pkg = await utils.pickPackage(config);
+  {
+    label: "schedule:list",
+    description: "List the schedules",
+    handler: async () => {
+      utils.sendCommands(`php artisan schedule:list`);
+    },
+  },
+  {
+    label: "schedule:run",
+    description: "Run the schedules",
+    handler: async () => {
+      utils.sendCommands(`php artisan schedule:run`);
+    },
+  },
+  {
+    label: "schedule:work",
+    description: "Work the schedules",
+    handler: async () => {
+      utils.sendCommands(`php artisan schedule:work`);
+    },
+  },
+  {
+    label: "schedule:test",
+    description: "Test the schedules",
+    handler: async () => {
+      utils.sendCommands(`php artisan schedule:test`);
+    },
+  },
+  {
+    label: "route:clear",
+    description: "Clear the routes",
+    handler: async () => {
+      utils.sendCommands(`php artisan route:clear`);
+    },
+  },
+  {
+    label: "route:cache",
+    description: "Cache the routes",
+    handler: async () => {
+      utils.sendCommands(`php artisan route:clear`);
+    },
+  },
+  {
+    label: "route:list",
+    description: "List the routes",
+    handler: async (config) => {
+      utils.sendCommands("php artisan route:list");
+    },
+  },
+  {
+    label: "db:seed",
+    description: "Seed the database",
+    handler: async (config) => {
+      utils.sendCommands("php artisan db:seed");
+    },
+  },
+  {
+    label: "db:table",
+    description: "Show the database tables",
+    handler: async (config) => {
+      utils.sendCommands("php artisan db:table");
+    },
+  },
+  {
+    label: "db:show",
+    description: "Show the database",
+    handler: async (config) => {
+      utils.sendCommands("php artisan db:show");
+    },
+  },
+  {
+    label: "db:monitor",
+    description: "Monitor the database",
+    handler: async (config) => {
+      utils.sendCommands("php artisan db:monitor");
+    },
+  },
+  {
+    label: "db:wipe",
+    description: "Wipe the database",
+    handler: async (config) => {
+      utils.sendCommands("php artisan db:wipe --force");
+    },
+  },
+  {
+    label: "optimize:clear",
+    description: "Clear the optimization cache",
+    handler: async (config) => {
+      utils.sendCommands("php artisan optimize:clear");
+    },
+  },
+  {
+    label: "frontend:build",
+    description: "Build the frontend",
+    handler: async (config) => {
+      utils.sendCommands("php artisan frontend:build");
+    },
+  },
+  {
+    label: "frontend:env",
+    description: "Set the frontend environment",
+    handler: async (config) => {
+      utils.sendCommands("php artisan frontend:env");
+    },
+  },
+  {
+    label: "ide:fix",
+    description: "Fix the IDE",
+    handler: async (config) => {
+      utils.sendCommands("php artisan ide:fix");
+    },
+  },
+  {
+    label: "metafox:dump",
+    description: "Dump the Metafox application",
+    handler: async (config) => {
+      utils.sendCommands("php artisan metafox:dump");
+    },
+  },
+  {
+    label: "metafox:stats",
+    description: "Show the Metafox statistics",
+    handler: async (config) => {
+      utils.sendCommands("php artisan metafox:stats");
+    },
+  },
+  {
+    label: "scribe:generate",
+    description: "Generate the API documentation",
+    handler: async (config) => {
+      utils.sendCommands("php artisan scribe:generate");
+    },
+  },
+  {
+    label: "event:cache",
+    description: "Cache the events",
+    handler: async (config) => {
+      utils.sendCommands("php artisan event:cache");
+    },
+  },
+  {
+    label: "event:clear",
+    description: "Clear the events",
+    handler: async (config) => {
+      utils.sendCommands("php artisan event:clear");
+    },
+  },
+  {
+    label: "backup:clean",
+    description: "Clean the backups",
+    handler: async (config) => {
+      utils.sendCommands("php artisan backup:clean");
+    },
+  },
+  {
+    label: "backup:run",
+    description: "Run the backups",
+    handler: async (config) => {
+      utils.sendCommands("php artisan backup:run");
+    },
+  },
+  {
+    label: "backup:monitor",
+    description: "Monitor the backups",
+    handler: async (config) => {
+      utils.sendCommands("php artisan backup:monitor");
+    },
+  },
+  {
+    label: "backup:list",
+    description: "List the backups",
+    handler: async (config) => {
+      utils.sendCommands("php artisan backup:list");
+    },
+  },
+  {
+    label: "cache:clear",
+    description: "Clear the cache",
+    handler: async (config) => {
+      utils.sendCommands("php artisan cache:clear");
+    },
+  },
+  {
+    label: "cache:forget",
+    description: "Forget the cache",
+    handler: async (config) => {
+      utils.sendCommands("php artisan cache:forget");
+    },
+  },
+  {
+    label: "cache:prune-stale-tags",
+    description: "Prune the stale tags",
+    handler: async (config) => {
+      utils.sendCommands("php artisan cache:prune-stale-tags");
+    },
+  },
+  {
+    label: "cache:reset",
+    description: "Reset the cache",
+    handler: async (config) => {
+      utils.sendCommands("php artisan cache:reset");
+    },
+  },
+  {
+    label: "cache:forget",
+    description: "Forget the cache",
+    handler: async (config) => {
+      utils.sendCommands("php artisan cache:forget");
+    },
+  },
+  {
+    label: "config:cache",
+    description: "Cache the config",
+    handler: async (config) => {
+      utils.sendCommands("php artisan config:cache");
+    },
+  },
+  {
+    label: "config:clear",
+    description: "Clear the config",
+    handler: async (config) => {
+      utils.sendCommands("php artisan config:clear");
+    },
+  },
+  {
+    label: "package:activate",
+    description: "Activate the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:activate ${pkg.name}`);
+    },
+  },
+  {
+    label: "package:discover",
+    description: "Discover the packages",
+    handler: async (config) => {
+      utils.sendCommands(`php artisan package:discover`);
+    },
+  },
+  {
+    label: "package:fix",
+    description: "Fix the packages",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:fix ${pkg.name}`);
+    },
+  },
+  {
+    label: "package:factory",
+    description: "Create a factory for the package",
+    handler: async (config) => {
+      const entities: string[] = [];
+      config.packages.forEach((pkg) => {
+        pkg.models.forEach((model) => {
+          entities.push(model.entity ?? model.name);
+        });
+      });
 
-    utils.sendCommands(`php artisan package:fix ${pkg.name}`);
+      const entity = await vscode.window.showQuickPick(entities, {
+        placeHolder: "Select the entity to create a factory for",
+      });
+      const count = await utils.pickNumber(1, "Number of items to factory");
+      utils.sendCommands(
+        `php artisan package:factory ${entity} --count=${count}`
+      );
+    },
   },
-  "package:factory": async (config) => {
-    const pkg = await utils.pickPackage(config);
+  {
+    label: "package:list",
+    description: "List the packages",
+    handler: async (config) => {
+      utils.sendCommands(`php artisan package:list`);
+    },
+  },
+  {
+    label: "package:install",
+    description: "Install the packages",
+    handler: async (config) => {
+      await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:install --fast`);
+    },
+  },
+  {
+    label: "package:make-api-controller",
+    description: "Create a API controller for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const model = await utils.pickModel(pkg);
+      utils.sendCommands(
+        `php artisan package:make-api-controller ${pkg.name} --name=${model.name}`
+      );
+    },
+  },
+  {
+    label: "package:make-datagrid",
+    description: "Create a datagrid for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(
+        `php artisan package:make-datagrid ${pkg.name} --help`
+      );
+    },
+  },
+  {
+    label: "package:make-form",
+    description: "Create a form for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:make-form ${pkg.name} --help`);
+    },
+  },
+  {
+    label: "package:make-importer",
+    description: "Create a importer for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(
+        `php artisan package:make-importer ${pkg.name} --help`
+      );
+    },
+  },
+  {
+    label: "package:make-job",
+    description: "Create a job for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const jobName = await utils.pickName("", "Enter your job name");
+      utils.sendCommands(
+        `php artisan package:make-job ${pkg.name} --name=${jobName}`
+      );
+    },
+  },
+  {
+    label: "package:make-listener",
+    description: "Create a listener for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const listenerName = await utils.pickName("", "Enter your listener name");
+      utils.sendCommands(
+        `php artisan package:make-listener ${pkg.name} --name=${listenerName}`
+      );
+    },
+  },
+  {
+    label: "package:make-mail",
+    description: "Create a mail for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const mailName = await utils.pickName("", "Enter your mail name");
+      utils.sendCommands(
+        `php artisan package:make-mail ${pkg.name} --name=${mailName}`
+      );
+    },
+  },
+  {
+    label: "package:make-migration",
+    description: "Create a migration for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const name = await utils.pickName("", "Enter your table name");
+      utils.sendCommands(
+        `php artisan package:make-migration ${pkg.name} --name=${name}`
+      );
+    },
+  },
+  {
+    label: "package:make-notification",
+    description: "Create a notification for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const name = await utils.pickName("", "Enter your migration name");
+      utils.sendCommands(
+        `php artisan package:make-notification ${pkg.name} --name=${name}`
+      );
+    },
+  },
+  {
+    label: "package:make-policy",
+    description: "Create a policy for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const model = await utils.pickModel(pkg);
+      utils.sendCommands(
+        `php artisan package:make-policy ${pkg.name} --name=${model.name}`
+      );
+    },
+  },
+  {
+    label: "package:make-request",
+    description: "Create a request for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:make-request ${pkg.name} --help`);
+    },
+  },
+  {
+    label: "package:make-rule",
+    description: "Create a rule for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const name = await utils.pickName("", "Enter rule name");
+      utils.sendCommands(
+        `php artisan package:make-rule ${pkg.name} --name=${name}`
+      );
+    },
+  },
+  {
+    label: "package:make-seeder",
+    description: "Create a seeder for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const model = await utils.pickModel(pkg);
+      utils.sendCommands(
+        `php artisan package:make-seeder ${pkg.name} --name=${model.name}`
+      );
+    },
+  },
+  {
+    label: "package:migrate-reset --path",
+    description: "Migrate reset for single migration file",
+    handler: async (config) => {
+      const filename = await utils.pickFilename(
+        "",
+        "Enter the migration refresh filename"
+      );
+      utils.sendCommands(
+        `php artisan package:migrate-reset --path=${filename}`
+      );
+    },
+  },
+  {
+    label: "package:migrate-reset {package}",
+    description: "Migrate reset for a package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      if (pkg) {
+        utils.sendCommands(`php artisan package:migrate-reset ${pkg.name}`);
+      }
+    },
+  },
+  {
+    label: "package:postinstall",
+    description: "Postinstall the packages",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:postinstall ${pkg.name}`);
+    },
+  },
+  {
+    label: "package:publish",
+    description: "Publish the packages",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:publish ${pkg.name} --help`);
+    },
+  },
+  {
+    label: "package:review",
+    description: "Review the packages",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:review ${pkg.name} --help`);
+    },
+  },
+  {
+    label: "package:uninstall",
+    description: "Uninstall the packages",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:uninstall ${pkg.name} --help`);
+    },
+  },
+  {
+    label: "package:make",
+    description: "Make the packages",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:make ${pkg.name} --help`);
+    },
+  },
+  {
+    label: "package:make-model",
+    description: "Create a model for the package",
+    handler: async (config) => {
+      const models: {
+        label: string;
+        description: string;
+        model: Model;
+        package: Package;
+      }[] = [];
 
-    utils.sendCommands(`php artisan package:factory ${pkg.name}`);
+      config.packages.forEach((pkg) => {
+        pkg.models.forEach((model) => {
+          models.push({
+            label: model.name,
+            description: `Create a model ${model.name}`,
+            model,
+            package: pkg,
+          });
+        });
+      });
+      const choice = await vscode.window.showQuickPick(models, {
+        placeHolder: "Select the model to create",
+      });
+      if (choice) {
+        utils.sendCommands(
+          [
+            `php artisan package:make-model ${choice.package.name}`,
+            `--name=${choice.model.name}`,
+            choice.model.factory && "--has-factory",
+            choice.model.policy && "--has-policy",
+            choice.model.repository && "--has-repository",
+          ]
+            .filter(Boolean)
+            .join(" ")
+        );
+      }
+    },
   },
-  "package:list": async (config) => {
-    utils.sendCommands(`php artisan package:list`);
+  {
+    label: "package:make-policy",
+    description: "Create a policy for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const model = await utils.pickModel(pkg);
+      utils.sendCommands(
+        `php artisan package:make-policy ${pkg.name} --name=${model.name}`
+      );
+    },
   },
-  "package:install": async (config) => {
-    await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:install`);
+  {
+    label: "package:make-rule",
+    description: "Create a rule for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const name = await utils.pickName("", "Enter rule name");
+      utils.sendCommands(
+        `php artisan package:make-rule ${pkg.name} --name=${name}`
+      );
+    },
   },
-  "package:make-api-controller": async (config) => {
-    const pkg = await utils.pickPackage(config);
-    const model = await utils.pickModel(pkg);
-
-    utils.sendCommands(
-      `php artisan package:make-api-controller ${pkg.name} --name=${model.name}`
-    );
+  {
+    label: "package:make-seeder",
+    description: "Create a seeder for the package",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      const model = await utils.pickModel(pkg);
+      utils.sendCommands(
+        `php artisan package:make-seeder ${pkg.name} --name=${model.name}`
+      );
+    },
   },
-  "package:make-category": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-category ${pkg.name}`);
+  {
+    label: "package:postinstall",
+    description: "Postinstall the packages",
+    handler: async (config) => {
+      const pkg = await utils.pickPackage(config);
+      utils.sendCommands(`php artisan package:postinstall ${pkg.name}`);
+    },
   },
-  "package:make-datagrid": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-datagrid ${pkg.name}`);
-  },
-  "package:make-form": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-form ${pkg.name}`);
-  },
-  "package:make-importer": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-importer ${pkg.name}`);
-  },
-  "package:make-job": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-job ${pkg.name}`);
-  },
-  "package:make-listener": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-listener ${pkg.name}`);
-  },
-  "package:make-mail": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-mail ${pkg.name}`);
-  },
-  "package:make-migration": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-migration ${pkg.name}`);
-  },
-  "package:make-notification": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-notification ${pkg.name}`);
-  },
-  "package:make-policy": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-policy ${pkg.name}`);
-  },
-  "package:make-request": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-request ${pkg.name}`);
-  },
-  "package:make-rule": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-rule ${pkg.name}`);
-  },
-  "package:make-seeder": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:make-seeder ${pkg.name}`);
-  },
-  "package:migrate": async (config) => {
-    await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:migrate`);
-  },
-  "package:postinstall": async (project) => {
-    const pkg = await utils.pickPackage(project);
-
-    utils.sendCommands(`php artisan package:postinstall ${pkg.name}`);
-  },
-  "package:publish": async (project) => {
-    const pkg = await utils.pickPackage(project);
-
-    utils.sendCommands(`php artisan package:publish ${pkg.name}`);
-  },
-  "package:review": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:review ${pkg.name}`);
-  },
-  "package:uninstall": async (config) => {
-    const pkg = await utils.pickPackage(config);
-
-    utils.sendCommands(`php artisan package:uninstall ${pkg.name}`);
-  },
-  "package:make": async (config) => {
-    await utils.pickPackage(config);
-    utils.sendCommands(`cd /app`);
-  },
-  "package:make-model": async (config) => {
-    const pkg = await utils.pickPackage(config);
-    const model = await utils.pickModel(pkg);
-
-    utils.sendCommands(
-      [
-        `php artisan package:make-model ${pkg.name} --name=${model.name}`,
-        model.factory && "--has-factory",
-        model.policy && "--has-policy",
-        model.repository && "--has-repository",
-      ]
-        .filter(Boolean)
-        .join(" ")
-    );
-  },
-};
+];
 
 export default commandList;

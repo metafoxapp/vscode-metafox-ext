@@ -2,7 +2,7 @@
   "name": "metafox-ext",
   "displayName": "MetaFox Command Helper",
   "description": "MetaFox extension helper",
-  "version": "0.0.4",
+  "version": "0.0.18",
   "author": {
     "name": "YouNetSocial",
     "email": "developer@phpfox.com",
@@ -45,7 +45,7 @@
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
-    "build": "npx vsce package"
+    "build": "rm metafox-ext-*.vsix && npx vsce package"
   },
   "devDependencies": {
     "@types/vscode": "^1.99.3",

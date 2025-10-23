@@ -83,16 +83,15 @@ function activate(context) {
     console.log('Congratulations, your extension "metafox-ext" is now active!');
     const registerCommand = (name, commands) => {
         const dispose = vscode.commands.registerCommand(name, async () => {
-            const project = await getProjectConfig();
-            const command = await vscode.window.showQuickPick(Object.keys(commands).sort(), {
+            const config = await getProjectConfig();
+            const choice = await vscode.window.showQuickPick(backend_1.default, {
                 placeHolder: "Choose the command",
             });
-            if (!command || !commands[command]) {
+            if (!choice) {
                 return;
             }
-            const callback = commands[command];
-            await callback(project);
-            vscode.window.showInformationMessage("Done");
+            await choice.handler(config);
+            // vscode.window.showInformationMessage("Done");
         });
         context.subscriptions.push(dispose);
     };

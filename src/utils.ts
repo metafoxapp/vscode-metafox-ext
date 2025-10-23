@@ -11,7 +11,7 @@ export const getTerminal = (name: string): vscode.Terminal => {
   const terminal = vscode.window.createTerminal(name);
 
   terminal.sendText("cd ~/Sites/vshare");
-  terminal.sendText("docker-compose exec app bash");
+  terminal.sendText("docker-compose exec -udaemon app bash");
 
   return terminal;
 };
@@ -19,7 +19,6 @@ export const getTerminal = (name: string): vscode.Terminal => {
 export const sendCommands = (...commands: string[]) => {
   const terminal = getTerminal("metafox-backend");
   terminal.show();
-  terminal.sendText("cd /app");
   terminal.sendText(
     commands
       .filter(Boolean)
@@ -55,4 +54,45 @@ export const pickModel = async (pkg: Package) => {
       placeHolder: "Choose the model name",
     })
     .then((result) => pkg?.models.find((x) => x.name === result)!);
+};
+
+export const pickNumber = async (
+  value: number,
+  placeHolder: string
+): Promise<number> => {
+  const txt = await vscode.window.showInputBox({
+    placeHolder,
+    value: value.toString(),
+    validateInput: (x) => (Number.isSafeInteger(x) ? x : undefined),
+  });
+  return Number(txt);
+};
+
+export const pickName = async (
+  value: string,
+  placeHolder: string
+): Promise<string> => {
+  let txt;
+  do {
+    txt = await vscode.window.showInputBox({
+      placeHolder,
+      value: value,
+      validateInput: (x) => (/^\w+$/.test(x) ? null : "Invalid name"),
+    });
+  } while (!txt);
+  return txt;
+};
+
+export const pickFilename = async (
+  value: string,
+  placeHolder: string
+): Promise<string> => {
+  let txt;
+  do {
+    txt = await vscode.window.showInputBox({
+      placeHolder,
+      value: value,
+    });
+  } while (!txt);
+  return txt;
 };

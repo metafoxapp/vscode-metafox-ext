@@ -33,7 +33,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.pickModel = exports.pickPackage = exports.getDockerAppTerminal = exports.sendCommands = exports.getTerminal = void 0;
+exports.pickFilename = exports.pickName = exports.pickNumber = exports.pickModel = exports.pickPackage = exports.getDockerAppTerminal = exports.sendCommands = exports.getTerminal = void 0;
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 const vscode = __importStar(require("vscode"));
@@ -44,14 +44,13 @@ const getTerminal = (name) => {
     }
     const terminal = vscode.window.createTerminal(name);
     terminal.sendText("cd ~/Sites/vshare");
-    terminal.sendText("docker-compose exec app bash");
+    terminal.sendText("docker-compose exec -udaemon app bash");
     return terminal;
 };
 exports.getTerminal = getTerminal;
 const sendCommands = (...commands) => {
     const terminal = (0, exports.getTerminal)("metafox-backend");
     terminal.show();
-    terminal.sendText("cd /app");
     terminal.sendText(commands
         .filter(Boolean)
         .map((x) => x.trim())
@@ -84,4 +83,36 @@ const pickModel = async (pkg) => {
         .then((result) => pkg?.models.find((x) => x.name === result));
 };
 exports.pickModel = pickModel;
+const pickNumber = async (value, placeHolder) => {
+    const txt = await vscode.window.showInputBox({
+        placeHolder,
+        value: value.toString(),
+        validateInput: (x) => (Number.isSafeInteger(x) ? x : undefined),
+    });
+    return Number(txt);
+};
+exports.pickNumber = pickNumber;
+const pickName = async (value, placeHolder) => {
+    let txt;
+    do {
+        txt = await vscode.window.showInputBox({
+            placeHolder,
+            value: value,
+            validateInput: (x) => (/^\w+$/.test(x) ? null : "Invalid name"),
+        });
+    } while (!txt);
+    return txt;
+};
+exports.pickName = pickName;
+const pickFilename = async (value, placeHolder) => {
+    let txt;
+    do {
+        txt = await vscode.window.showInputBox({
+            placeHolder,
+            value: value,
+        });
+    } while (!txt);
+    return txt;
+};
+exports.pickFilename = pickFilename;
 //# sourceMappingURL=utils.js.map

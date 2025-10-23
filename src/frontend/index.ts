@@ -1,5 +1,5 @@
 import { CommandList } from "../typings";
 
-const frontendCommands: CommandList = {};
+const frontendCommands: CommandList = [];
 
 export default frontendCommands;

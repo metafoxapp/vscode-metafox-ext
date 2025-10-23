@@ -50,20 +50,16 @@ export function activate(context: vscode.ExtensionContext) {
 
   const registerCommand = (name: string, commands: CommandList) => {
     const dispose = vscode.commands.registerCommand(name, async () => {
-      const project = await getProjectConfig();
-      const command = await vscode.window.showQuickPick(
-        Object.keys(commands).sort(),
-        {
-          placeHolder: "Choose the command",
-        }
-      );
-      if (!command || !commands[command]) {
+      const config = await getProjectConfig();
+      const choice = await vscode.window.showQuickPick(backendCommands, {
+        placeHolder: "Choose the command",
+      });
+      if (!choice) {
         return;
       }
-      const callback = commands[command];
 
-      await callback(project);
-      vscode.window.showInformationMessage("Done");
+      await choice.handler(config);
+      // vscode.window.showInformationMessage("Done");
     });
     context.subscriptions.push(dispose);
   };

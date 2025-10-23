@@ -17,6 +17,7 @@ export type ProjectConfig = {
 export type Model = {
   name: string;
   repository?: boolean;
+  entity?: string;
   factory?: boolean;
   policy?: boolean;
 };
@@ -30,6 +31,9 @@ export type UserInput = {
   model?: Model;
 };
 
-export type CommandList = {
-  [key: string]: (config: ProjectConfig) => Promise<void>;
+export type CommandList = Command[];
+export type Command = {
+  label: string;
+  description: string;
+  handler: (config: ProjectConfig) => Promise<void>;
 };
